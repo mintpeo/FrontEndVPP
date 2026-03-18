@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import './detail.css';
 
 import {useParams} from "react-router-dom";
@@ -30,7 +30,7 @@ const Detail = () => {
         const listImage = [...product.images];
 
         for (let i = 1; i < listImage.length; i++) {
-            if (imgColo === listImage[i]) {
+            if (imgColo === listImage[i].image) {
                 setActiveIndex(i);
             }
         }
@@ -77,7 +77,7 @@ const Detail = () => {
             <div className="container">
                 {/* IMAGE */}
                 <div className="img-dt">
-                    <img src={product.images[activeIndex]} alt="" className="img-main"/>
+                    <img src={product.images[activeIndex].image} alt="" className="img-main"/>
 
                     {/* IMAGES SUB */}
                     <div className="img-sub">
@@ -99,7 +99,7 @@ const Detail = () => {
                                         <div className="img-list" onClick={() => {
                                             setActiveIndex(index);
                                         }}>
-                                            <img className={`img-item ${activeIndex === index ? 'active' : ''}`} src={item} alt="img-sub" />
+                                            <img className={`img-item ${activeIndex === index ? 'active' : ''}`} src={item.image} alt="img-sub" />
                                         </div>
                                     </SwiperSlide>
                                 ))
@@ -138,7 +138,7 @@ const Detail = () => {
                             <div onClick={() => {
                                 handleTypeCol(item.image);
                                 setNumTypeCol(index);
-                            }} className={`type-color ${handleChooseType(index) ? 'active' : ''}`} style={{backgroundColor: item.code}}></div>
+                            }} className={`type-color ${handleChooseType(index) ? 'active' : ''}`} style={{backgroundColor: item.info.code}}></div>
                         ))}
                     </div>
 

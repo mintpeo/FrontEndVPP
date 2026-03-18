@@ -217,7 +217,7 @@
 
           .content {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: 1fr 2fr;
 
             .content-left {
               .menu-list {
@@ -245,7 +245,7 @@
 
             .content-right {
               img {
-                width: auto;
+                width: 100%;
                 height: 290px;
                 cursor: auto;
               }

@@ -22,9 +22,9 @@ import useFetch from "../hooks/useFetch.js";
 import {useNavigate} from "react-router-dom";
 
 const Home = () => {
-    const {data: products} = useFetch(`${API_URL}/products`);
-    const {data: infoSales} = useFetch(`${API_URL}/infoSale`);
-    const {data: banners} = useFetch(`${API_URL}/banner`);
+    const {data: products} = useFetch(`${API_URL}/products/all`);
+    const {data: infoSales} = useFetch(`${API_URL}/infoSales/all`);
+    const {data: banners} = useFetch(`${API_URL}/banners/all`);
 
     // Navigate to detail
     const navigate = useNavigate();
@@ -96,10 +96,10 @@ const Home = () => {
                                 products.slice(0, 5).map((item) => (
                                     <div className="container-product">
                                         <div className="name" onClick={() => handleToDetail(item.id)}><a title={item.name}>{item.name}</a></div>
-                                        <div className="img" onClick={() => handleToDetail(item.id)}><a title={item.name}><img src={item.images[0]} alt=""/></a></div>
+                                        <div className="img" onClick={() => handleToDetail(item.id)}><a title={item.name}><img src={item.images[0].image} alt=""/></a></div>
                                         <div className="price">
-                                            <p className="price-dis">{item.price.toLocaleString()} {item.currency}</p>
-                                            <p className="price-noDis">{item.originalPrice.toLocaleString()} {item.currency}</p>
+                                            <p className="price-dis">{item.price.toLocaleString()}{item.currency}</p>
+                                            <p className="price-noDis">{item.originalPrice.toLocaleString()}{item.currency}</p>
                                             <div className="dis-per">-{calculateDiscountPercentage(item.originalPrice, item.price)}%</div>
                                         </div>
                                         <div className="buy">
@@ -135,7 +135,7 @@ const Home = () => {
                         {
                             products.slice(0, 5).map((item) => (
                             <div className="item" onClick={() => handleToDetail(item.id)}>
-                                <div className="item-img"><img src={item.images[0]} alt="item-img"/></div>
+                                <div className="item-img"><img src={item.images[0].image} alt="item-img"/></div>
                                 <div className="item-stock">
                                     <div className="icon"><AiOutlineStock />Số lượng: {item.stock}</div>
                                 </div>
@@ -145,10 +145,10 @@ const Home = () => {
                                     <div className="rating-star">({item.rating})</div>
                                 </div>
                                 <div className="item-price">
-                                    <div className="price-dis">{item.price.toLocaleString()} {item.currency}</div>
+                                    <div className="price-dis">{item.price.toLocaleString()}{item.currency}</div>
                                     <div className="price-noDis">
                                         <div className="price-ori">
-                                            {item.originalPrice.toLocaleString()} {item.currency}
+                                            {item.originalPrice.toLocaleString()}{item.currency}
                                         </div>
                                         <div className="dis-per">
                                             - {calculateDiscountPercentage(item.originalPrice, item.price)}%

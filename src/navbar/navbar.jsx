@@ -14,28 +14,15 @@ import { FaChevronDown } from "react-icons/fa";
 import {API_URL, INFO_USER, KEY_LOGGED, QUANTITY_CART} from "../service/API_URL.jsx";
 import {GetStoredUser} from '../service/GetStoredUser.jsx';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import useFetch from "../hooks/useFetch.js";
 
 const Navbar = () => {
-    const location = useLocation();
-    const navigate = useNavigate();
-
-    const [cates, setCates] = useState([]);
+    const {data:cates} = useFetch(`${API_URL}/categories/all`);
     const [loginStatus, setLoginStatus] = useState("");
     const [user, setUser] = useState();
 
-    useEffect(() => {
-        // Load Data Categories
-        const loadCates = async () => {
-            try {
-                const res = await fetch(`${API_URL}/categories`);
-                const data = await res.json();
-                setCates(data);
-            } catch (e) {
-                console.log("Load Categories: ", e);
-            }
-        }
-        loadCates();
-    }, []);
+    const location = useLocation();
+    const navigate = useNavigate();
 
     // Login Status
     useEffect(() => {
@@ -56,14 +43,14 @@ const Navbar = () => {
     };
 
     // Add icon-down
-    const renderIconDown = (cateId) => {
-        if (cateId !== "cate6") return <FaChevronDown />;
+    const renderIconDown = (items) => {
+        if (items.length > 0) return <FaChevronDown />;
         return null;
     };
 
     // Add position
     const position = (cateId) => {
-      if (cateId === "cate1") return {position: "relative"};
+      if (cateId === 1) return {position: "relative"};
       return {};
     };
 
@@ -154,7 +141,7 @@ const Navbar = () => {
                                 <li key={cate.id} className="item-cate flex-center">
                                     <div className="icon flex-center" style={position(cate.id)}><img src={cate.image} alt="icon-menu"/></div>
                                     <div className="name">{cate.name}</div>
-                                    <div className="iconDown flex-center">{renderIconDown(cate.id)}</div>
+                                    <div className="iconDown flex-center">{renderIconDown(cate.items)}</div>
 
                                     {/*  DROP DOWN CONTENT  */}
                                     {getCateById(cate.id) && getCateById(cate.id).length > 0 ? (
@@ -165,7 +152,7 @@ const Navbar = () => {
                                                             {/*  Map item from cate.items  */}
                                                             {getCateById(cate.id).map((item) => (
                                                                 <li className="menu-item">
-                                                                    <a className="item-name" href="#" title={item}>{item}</a>
+                                                                    <a className="item-name" href="#" title={item}>{item.item}</a>
                                                                 </li>
                                                             ))}
                                                         </ul>

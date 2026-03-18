@@ -187,7 +187,7 @@
 }
 #navbar .cate .list-cate .item-cate .dropdown-content .content {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: 1fr 2fr;
 }
 #navbar .cate .list-cate .item-cate .dropdown-content .content .content-left .menu-list {
   list-style: none;
@@ -208,7 +208,7 @@
   color: #2659f3;
 }
 #navbar .cate .list-cate .item-cate .dropdown-content .content .content-right img {
-  width: auto;
+  width: 100%;
   height: 290px;
   cursor: auto;
 }
