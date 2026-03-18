@@ -17,7 +17,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import useFetch from "../hooks/useFetch.js";
 
 const Navbar = () => {
-    const {data:cates} = useFetch(`${API_URL}/categories/all`);
+    const {data:cates} = useFetch(`${API_URL}/category/all`);
     const [loginStatus, setLoginStatus] = useState("");
     const [user, setUser] = useState();
 
