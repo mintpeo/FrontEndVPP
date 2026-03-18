@@ -17,23 +17,23 @@ const Login = () => {
         e.preventDefault();
 
         try {
-            const res = await fetch(`${API_URL}/users?email=${email}&password=${password}`);
+            const res = await fetch(`${API_URL}/user/login?email=${email}&pass=${password}`);
             const user = await res.json(); // array
 
-            if (user.length > 0) {
+            if (user) {
                 const publicInfo = {
-                    id: user[0].id,
-                    lastName: user[0].lastName,
-                    firstName: user[0].firstName,
-                    email: user[0].email,
-                    phone: user[0].phone,
-                    "dateOfBirth": user[0].dateOfBirth,
-                    "address": user[0].address
+                    id: user.id,
+                    lastName: user.lastName,
+                    firstName: user.firstName,
+                    email: user.email,
+                    phone: user.phone,
+                    dateOfBirth: user.dateOfBirth,
+                    address: user.address
                 }
 
                 // Save Info User
                 localStorage.setItem(KEY_LOGGED, "true");
-                localStorage.setItem(INFO_USER, JSON.stringify(publicInfo)); // array[0]
+                localStorage.setItem(INFO_USER, JSON.stringify(publicInfo)); // array -> Object
 
                 alert("Đăng nhập thành công!");
                 navigate("/");

@@ -13,7 +13,7 @@ import { HiTicket } from "react-icons/hi2";
 const Detail = () => {
     // Get id product from url
     const {id} = useParams();
-    const {data: product, loading: loading} = useFetch(`${API_URL}/products/${id}`);
+    const {data: product, loading: loading} = useFetch(`${API_URL}/product/${id}`);
 
     // Save index img-main and img-sub
     const [activeIndex, setActiveIndex] = useState(0);

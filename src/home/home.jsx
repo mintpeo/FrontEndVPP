@@ -22,9 +22,9 @@ import useFetch from "../hooks/useFetch.js";
 import {useNavigate} from "react-router-dom";
 
 const Home = () => {
-    const {data: products} = useFetch(`${API_URL}/products/all`);
-    const {data: infoSales} = useFetch(`${API_URL}/infoSales/all`);
-    const {data: banners} = useFetch(`${API_URL}/banners/all`);
+    const {data: products} = useFetch(`${API_URL}/product/all`);
+    const {data: infoSales} = useFetch(`${API_URL}/infoSale/all`);
+    const {data: banners} = useFetch(`${API_URL}/banner/all`);
 
     // Navigate to detail
     const navigate = useNavigate();
