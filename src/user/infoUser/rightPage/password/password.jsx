@@ -2,30 +2,19 @@ import React, {useEffect, useState} from 'react';
 import './password.css';
 
 import {GetStoredUser} from "../../../../service/GetStoredUser.jsx";
-import {API_URL} from "../../../../service/API_URL.jsx";
+import {API_URL, INFO_USER} from "../../../../service/API_URL.jsx";
 
 const Password = () => {
     const API = API_URL;
 
-    const [user] = useState(GetStoredUser);
     const [oldPassword, setOldPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [newAgainPassword, setNewAgainPassword] = useState("");
 
     const [isValid, setIsValid] = useState(false);
 
-    // VERIFY PASSWORD
-    const verifyPassword = async () => {
-        try {
-            const res = await fetch(`${API}/users?email=${user.email}&password=${oldPassword}`);
-            const checkPass = await res.json();
-
-            return checkPass.length > 0;
-        } catch (error) {
-            console.log("Error Verify Password:", error);
-            return false;
-        }
-    };
+    const userString = localStorage.getItem(INFO_USER);
+    const user = JSON.parse(userString);
 
     // CHECK NEW PASSWORD AND NEW PASSWORD AGAIN
     useEffect(() => {
@@ -41,28 +30,27 @@ const Password = () => {
     // UPDATE PASSWORD
     const updatePassword = async (e) => {
         e.preventDefault();
-        // Check Password
-        const isOldPassCorrect = await verifyPassword();
-        if (!isOldPassCorrect) {
-            alert("Mật khẩu cũ không đúng!");
-            return;
-        }
 
         const changePassword = {
-            ...user,
-            "password": newPassword
+            email: user.email,
+            oldPass: oldPassword,
+            newPass: newPassword
         }
 
         try {
-            const res = await fetch(`${API}/users/${user.id}`, {
+            const res = await fetch(`${API}/user/changePass`, {
                 method: "PATCH",
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(changePassword),
             });
 
-            if (res.ok) {
+            const status = await res.json();
+
+            if (status) {
                 alert("Đổi mật khẩu thành công!");
                 window.location.reload();
+            } else {
+                alert("Mật khẩu cũ không đúng!");
             }
 
         } catch (e) {
