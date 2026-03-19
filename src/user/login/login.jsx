@@ -17,29 +17,32 @@ const Login = () => {
         e.preventDefault();
 
         try {
-            const res = await fetch(`${API_URL}/user/login?email=${email}&pass=${password}`);
+            const res = await fetch(`${API_URL}/user/login`, {
+                method: "Post",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    email: email,
+                    pass: password
+                }),
+            });
+
+            if (!res.ok) {
+                const message = await res.text();
+                alert(message);
+                return;
+            }
+
             const user = await res.json(); // array
 
-            if (user) {
-                const publicInfo = {
-                    id: user.id,
-                    lastName: user.lastName,
-                    firstName: user.firstName,
-                    email: user.email,
-                    phone: user.phone,
-                    dateOfBirth: user.dateOfBirth,
-                    address: user.address
-                }
+            // Save Info User
+            localStorage.setItem(KEY_LOGGED, "true");
+            localStorage.setItem(INFO_USER, JSON.stringify(user)); // array -> Object
 
-                // Save Info User
-                localStorage.setItem(KEY_LOGGED, "true");
-                localStorage.setItem(INFO_USER, JSON.stringify(publicInfo)); // array -> Object
+            alert("Đăng nhập thành công!");
+            navigate("/");
 
-                alert("Đăng nhập thành công!");
-                navigate("/");
-            } else {
-                alert("Sai thông tin tài khoản!");
-            }
         } catch (error) {
             console.log("Error Login:", error);
         }
@@ -64,7 +67,7 @@ const Login = () => {
 
                    <button className="btn-login" type="sumbit">Đăng nhập</button>
 
-                   <div className="forget-pass">Bạn chưa có tài khoản <b>Đăng ký tại đây</b></div>
+                   <div className="forget-pass">Bạn chưa có tài khoản <b onClick={() => navigate("/user/sign")}>Đăng ký tại đây</b></div>
 
                    <div className="login-more">
                        <div className="btn" style={{background: "#DE3F32"}}>

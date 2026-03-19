@@ -22,10 +22,10 @@ const Sign = () => {
         e.preventDefault();
 
         // Check duplication
-        const checkRes = await fetch(`${API}/users?email=${email}`);
+        const checkRes = await fetch(`${API}/user/checkEmail?email=${email}`);
         const existUsers = await checkRes.json();
 
-        if (existUsers.length > 0) {
+        if (existUsers) {
             alert("Email này đã có người sử dụng!");
             return;
         }
@@ -37,13 +37,10 @@ const Sign = () => {
             lastName: lastName,
             firstName: firstName,
             phone: phone,
-            dateOfBirth: "",
-            address: "",
-            role: "user"
         };
 
         try {
-            const res = await fetch(`${API}/users`, {
+            const res = await fetch(`${API}/user/sign`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -52,10 +49,21 @@ const Sign = () => {
             });
 
             if (res.ok) {
-                const resLogin = await fetch(`${API}/users?email=${email}&password=${password}`);
-                const user = await resLogin.json();
+                const loginUser = await fetch(`${API_URL}/user/login`, {
+                    method: "Post",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        pass: password
+                    }),
+                });
+
+                const logined = await loginUser.json();
+
                 localStorage.setItem(KEY_LOGGED, "true");
-                localStorage.setItem(INFO_USER, JSON.stringify(user[0]));
+                localStorage.setItem(INFO_USER, JSON.stringify(logined));
                 alert("Đăng ký thành công.");
                 navigate("/");
             }
@@ -100,7 +108,7 @@ const Sign = () => {
 
                     <button className="btn-login" type="submit">Đăng ký</button>
 
-                    <div className="forget-pass">Bạn đã có tài khoản <b>Đăng nhập tại đây</b></div>
+                    <div className="forget-pass">Bạn đã có tài khoản <b onClick={() => navigate("/user/login")}>Đăng nhập tại đây</b></div>
 
                     <div className="login-more">
                         <div className="btn" style={{background: "#DE3F32"}}>
