@@ -90,9 +90,9 @@ const Detail = () => {
                             observeParents={true}
                             centerInsufficientSlides={true}
                             loop={false}
+                            navigation={true}
 
-                            className="banner-slider"
-                        >
+                            className="banner-slider">
                             {
                                 product.images.map((item, index) => (
                                     <SwiperSlide key={index}>
@@ -133,14 +133,18 @@ const Detail = () => {
                     </div>
 
                     {/* Type */}
-                    <div className="type">Phân loại:
-                        {product.colors.map((item, index) => (
-                            <div onClick={() => {
-                                handleTypeCol(item.image);
-                                setNumTypeCol(index);
-                            }} className={`type-color ${handleChooseType(index) ? 'active' : ''}`} style={{backgroundColor: item.info.code}}></div>
-                        ))}
-                    </div>
+                    {
+                        product.colors && product.colors.length > 0 ? (
+                            <div className="type">Phân loại:
+                                {product.colors.map((item, index) => (
+                                    <div onClick={() => {
+                                        handleTypeCol(item.image);
+                                        setNumTypeCol(index);
+                                    }} className={`type-color ${handleChooseType(index) ? 'active' : ''}`} style={{backgroundColor: item.info.code}}></div>
+                                ))}
+                            </div>
+                        ) : ("")
+                    }
 
                     {/* Amount */}
                     <div className="amount">

@@ -12,9 +12,7 @@ const Password = () => {
     const [newAgainPassword, setNewAgainPassword] = useState("");
 
     const [isValid, setIsValid] = useState(false);
-
-    const userString = localStorage.getItem(INFO_USER);
-    const user = JSON.parse(userString);
+    const user = GetStoredUser();
 
     // CHECK NEW PASSWORD AND NEW PASSWORD AGAIN
     useEffect(() => {
