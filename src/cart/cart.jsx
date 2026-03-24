@@ -10,15 +10,16 @@ import useFetch from "../hooks/useFetch.js";
 const Cart = () => {
     const user = GetStoredUser();
     // Load list carts
-    const {data: listCarts}= useFetch(`${API_URL}/cart?email=${user.email}`);
-    const [carts, setCarts] = useState([]);
+    const {data: carts}= useFetch(`${API_URL}/cart?userId=${user.id}`);
     const [selectedItems, setSelectedItems] = useState([]);
 
     const navigate = useNavigate();
 
-    useEffect(() => {
-        if (listCarts && listCarts.carts) setCarts(listCarts.carts);
-    }, [listCarts])
+    console.log(carts);
+
+    // const loadCarts = async () => {
+    //     useFetch(`${API_URL}/cart?userId=${user.id}`);
+    // }
 
     // Selected Item
     const toggleSelectItem = (item) => {
@@ -36,14 +37,10 @@ const Cart = () => {
         let total = 0;
         let stringCur = "";
 
-        selectedItems.forEach(itemSelected => {
-            carts.forEach(itemCart => {
-                if (itemSelected.id === itemCart.id) {
-                    total += itemCart.price * itemCart.quantity;
-                }
-                stringCur = itemCart.currency;
-            })
-        });
+        selectedItems.forEach(item => {
+            total += item.product.price;
+            stringCur = item.product.currency;
+        })
 
         return total.toLocaleString() + " " + stringCur;
     };
@@ -58,21 +55,21 @@ const Cart = () => {
 
     // Add or Sub Quantity
     const updateQuantity = async (num, id, quantity) => {
-    //     let newQuantity = num + quantity;
-    //
-    //     if (newQuantity < 1) return;
-    //
-    //     try {
-    //         const res = await fetch(`${API_URL}/carts/${id}`, {
-    //             method: "PATCH",
-    //             headers: {'Content-Type': 'application/json'},
-    //             body: JSON.stringify({"quantity": newQuantity}),
-    //         });
-    //
-    //         if (res.ok) loadCarts();
-    //     } catch (e) {
-    //         console.log("ERROR UPDATE_QUANTITY ", e);
-    //     }
+        let newQuantity = num + quantity;
+
+        if (newQuantity < 1) return;
+
+        try {
+            const res = await fetch(`${API_URL}/cart/quantity?id=${id}&quantity=${newQuantity}`, {
+                method: "PATCH",
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({"quantity": newQuantity}),
+            });
+
+            // if (res.ok) useFetch(`${API_URL}/cart?userId=${user.id}`);
+        } catch (e) {
+            console.log("ERROR UPDATE_QUANTITY ", e);
+        }
     };
 
     // Remove Product In Cart
@@ -116,20 +113,22 @@ const Cart = () => {
                     <div className="main-cart">
                         <div className="container-left">
                             {
-                                carts.map(item => (
+                                carts.slice().sort((a, b) => a.product.id - b.product.id)
+                                    .map(item => (
                                     <div className="list-cart">
                                         <input
                                             type="checkbox"
+                                            style={{cursor: "pointer"}}
                                             checked={selectedItems.some(selected => selected.id === item.id)}
                                             onChange={() => toggleSelectItem(item)}
                                         />
 
-                                        <img src={item.product.image} alt="" className="item-img"/>
+                                        <img src={item.image} alt="" className="item-img"/>
 
                                         <div className="item-cart">
                                             <div className="item-left">
                                                 <div className="name" title="222">{item.product.name}</div>
-                                                {item.product.type && item.product.type.length > 0 ? (<div className="type">Loại: {item.product.type}</div>) : ("")}
+                                                {item.type && item.type.length > 0 ? (<div className="type">Loại: {item.type}</div>) : ("")}
                                             </div>
 
                                             <div className="item-middle">
