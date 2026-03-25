@@ -104,6 +104,8 @@ const Cart = () => {
         }
     };
 
+    console.log(carts)
+
     //  Calculate Dis %
     const calculateDiscountPercentage = (originalPrice, discountedPrice) => {
         let savings = originalPrice - discountedPrice;
@@ -122,60 +124,64 @@ const Cart = () => {
         <div id="cart">
             <div className="container">
                 <div className="title">Giỏ hàng</div>
-                    <div className="main-cart">
-                        <div className="container-left">
-                            {
-                                carts.slice().sort((a, b) => a.id - b.id)
+                {
+                    carts && carts.length > 0 ? (
+                        <div className="main-cart">
+                            <div className="container-left">
+                                {carts.slice().sort((a, b) => a.id - b.id)
                                     .map(item => (
-                                    <div className="list-cart">
-                                        <input
-                                            type="checkbox"
-                                            style={{cursor: "pointer"}}
-                                            checked={selectedItems.includes(item.id)}
-                                            onChange={() => toggleSelectItem(item.id)}
-                                        />
+                                        <div className="list-cart">
+                                            <input
+                                                type="checkbox"
+                                                style={{cursor: "pointer"}}
+                                                checked={selectedItems.includes(item.id)}
+                                                onChange={() => toggleSelectItem(item.id)}
+                                            />
 
-                                        <img src={item.image} alt="" className="item-img"/>
+                                            <img src={item.image} alt="" className="item-img"/>
 
-                                        <div className="item-cart">
-                                            <div className="item-left">
-                                                <div className="name" title="222">{item.product.name}</div>
-                                                {item.type && item.type.length > 0 ? (<div className="type">Loại: {item.type}</div>) : ("")}
+                                            <div className="item-cart">
+                                                <div className="item-left">
+                                                    <div className="name" title="222">{item.product.name}</div>
+                                                    {item.type && item.type.length > 0 ? (<div className="type">Loại: {item.type}</div>) : ("")}
+                                                </div>
+
+                                                <div className="item-middle">
+                                                    <div className="price-dis">{item.product.price.toLocaleString()} {item.product.currency}</div>
+                                                    <div className="price-noDis">{item.product.originalPrice.toLocaleString()} {item.product.currency}</div>
+                                                    <div className="price-percent">-{calculateDiscountPercentage(item.product.originalPrice, item.product.price)}%</div>
+                                                </div>
+
+                                                <div className="item-right">
+                                                    <button onClick={() => updateQuantity(-1, item.id, item.quantity)} className="btn">-</button>
+                                                    <div className="quantity">{item.quantity}</div>
+                                                    <button onClick={() => updateQuantity(+1, item.id, item.quantity)} className="btn" style={{borderRadius: "0 4px 4px 0"}}>+</button>
+                                                </div>
+
+                                                <button onClick={() => removeProduct(item.id)} className="btn-remove" title="Xoá">X</button>
                                             </div>
+                                        </div>))
+                                }
+                            </div>
+                            <div className="container-right">
+                                <div className="total-price">
+                                    <div>Tổng tiền</div>
+                                    <div className="price">{totalPrice()}</div>
+                                </div>
 
-                                            <div className="item-middle">
-                                                <div className="price-dis">{item.product.price.toLocaleString()} {item.product.currency}</div>
-                                                <div className="price-noDis">{item.product.originalPrice.toLocaleString()} {item.product.currency}</div>
-                                                <div className="price-percent">-{calculateDiscountPercentage(item.product.originalPrice, item.product.price)}%</div>
-                                            </div>
-
-                                            <div className="item-right">
-                                                <button onClick={() => updateQuantity(-1, item.id, item.quantity)} className="btn">-</button>
-                                                <div className="quantity">{item.quantity}</div>
-                                                <button onClick={() => updateQuantity(+1, item.id, item.quantity)} className="btn" style={{borderRadius: "0 4px 4px 0"}}>+</button>
-                                            </div>
-
-                                            <button onClick={() => removeProduct(item.id)} className="btn-remove" title="Xoá">X</button>
-                                        </div>
-                                    </div>
-                                ))
-                            }
-                        </div>
-                        <div className="container-right">
-                            <div className="total-price">
-                                <div>Tổng tiền</div>
-                                <div className="price">{totalPrice()}</div>
+                                <div className="note">
+                                    <div className="title-note">Ghi chú đơn hàng <span>(Không hỗ trợ đổi hàng và màu sắc liên quan đơn hàng sản phẩm giao ngẫu nhiên)</span></div>
+                                    <textarea className="input-note" rows="8"></textarea>
+                                    <button onClick={clickCheckOut} className="btn-cart" title="Tiến hành đặt hàng">Tiến hành đặt hàng</button>
+                                </div>
                             </div>
 
-                            <div className="note">
-                                <div className="title-note">Ghi chú đơn hàng <span>(Không hỗ trợ đổi hàng và màu sắc liên quan đơn hàng sản phẩm giao ngẫu nhiên)</span></div>
-                                <textarea className="input-note" rows="8"></textarea>
-                                <button onClick={clickCheckOut} className="btn-cart" title="Tiến hành đặt hàng">Tiến hành đặt hàng</button>
-                            </div>
+                            <div className="free-ship"><i><MdLocalShipping /></i>Miễn phí vận chuyển cho đơn hàng từ 100,000₫</div>
                         </div>
-                        <div className="free-ship"><i><MdLocalShipping /></i>Miễn phí vận chuyển cho đơn hàng từ 100,000₫</div>
-                    </div>
-                    {carts.length === 0 && <p>Chưa có sản phẩm nào trong giỏ hàng - quay về <Link to="/" style={{textDecoration: "none", color: "#007bff"}}>Trang Chủ</Link> để mua hàng</p>}
+                    ) : (
+                        <p>Chưa có sản phẩm nào trong giỏ hàng - quay về <Link to="/" style={{textDecoration: "none", color: "#007bff"}}>Trang Chủ</Link> để mua hàng</p>
+                    )
+                }
             </div>
         </div>
     );
