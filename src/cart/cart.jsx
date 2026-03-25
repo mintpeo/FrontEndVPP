@@ -10,42 +10,49 @@ import useFetch from "../hooks/useFetch.js";
 const Cart = () => {
     const user = GetStoredUser();
     // Load list carts
-    const {data: carts}= useFetch(`${API_URL}/cart?userId=${user.id}`);
+    const {data: serverCarts} = useFetch(`${API_URL}/cart?userId=${user.id}`);
+    const [carts, setCarts] = useState([]);
     const [selectedItems, setSelectedItems] = useState([]);
 
     const navigate = useNavigate();
 
-    console.log(carts);
-
-    // const loadCarts = async () => {
-    //     useFetch(`${API_URL}/cart?userId=${user.id}`);
-    // }
+    // Clone list carts
+    useEffect(() => {
+        if (serverCarts && serverCarts.length > 0) {
+            const clone = serverCarts.map(item => ({...item}))
+            setCarts(clone);
+        }
+    }, [serverCarts])
 
     // Selected Item
-    const toggleSelectItem = (item) => {
-        const isExisted = selectedItems.some(selected => selected.id === item.id);
-
-        if (isExisted) {
-            setSelectedItems(selectedItems.filter(selected => selected.id !== item.id)); // Co Roi Thi Loai Bo
+    const toggleSelectItem = (id) => {
+        if (selectedItems.includes(id)) {
+            setSelectedItems(selectedItems.filter(selectedId => selectedId !== id)); // Co Roi Thi Loai Bo
         } else {
-            setSelectedItems([...selectedItems, item]); // Chua Thi Them Vao
+            setSelectedItems([...selectedItems, id]); // Chua Thi Them Vao
         }
     };
 
     // Total Price In Cart
     const totalPrice = () => {
-        let total = 0;
-        let stringCur = "";
+        const selected = carts.filter(item => selectedItems.includes(item.id))
 
-        selectedItems.forEach(item => {
-            total += item.product.price;
-            stringCur = item.product.currency;
-        })
+        if (selected.length === 0) return "0";
 
-        return total.toLocaleString() + " " + stringCur;
+        const {total, cur} = selected.reduce((acc, item) => {
+            const product = item.product;
+            acc.total += product.price * item.quantity;
+
+            if (!acc.cur) acc.cur = product.currency;
+
+            return acc;
+            // return acc mean {total: ..., cur: ...}
+        }, {total: 0, cur: ""});
+
+        return total.toLocaleString() + cur; // ko return acc -> undefined
     };
 
-    // Update Quantity Cart
+    // Update Quantity Cart In Navbar
     useEffect(() => {
         if (carts && carts.length > 0) {
             let quantity = carts.length;
@@ -59,14 +66,20 @@ const Cart = () => {
 
         if (newQuantity < 1) return;
 
+        // for each phai F5 moi update
+        const upNewQuan = carts.map(item => {
+            if (item.id === id) return {...item, quantity: newQuantity};
+            return item;
+        })
+
+        setCarts(upNewQuan);
+
         try {
-            const res = await fetch(`${API_URL}/cart/quantity?id=${id}&quantity=${newQuantity}`, {
+            await fetch(`${API_URL}/cart/quantity?id=${id}&quantity=${newQuantity}`, {
                 method: "PATCH",
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({"quantity": newQuantity}),
             });
-
-            // if (res.ok) useFetch(`${API_URL}/cart?userId=${user.id}`);
         } catch (e) {
             console.log("ERROR UPDATE_QUANTITY ", e);
         }
@@ -83,7 +96,6 @@ const Cart = () => {
                 });
 
                 if (res.ok) {
-                    // loadCarts();
                     window.location.reload();
                 }
             } catch (e) {
@@ -113,14 +125,14 @@ const Cart = () => {
                     <div className="main-cart">
                         <div className="container-left">
                             {
-                                carts.slice().sort((a, b) => a.product.id - b.product.id)
+                                carts.slice().sort((a, b) => a.id - b.id)
                                     .map(item => (
                                     <div className="list-cart">
                                         <input
                                             type="checkbox"
                                             style={{cursor: "pointer"}}
-                                            checked={selectedItems.some(selected => selected.id === item.id)}
-                                            onChange={() => toggleSelectItem(item)}
+                                            checked={selectedItems.includes(item.id)}
+                                            onChange={() => toggleSelectItem(item.id)}
                                         />
 
                                         <img src={item.image} alt="" className="item-img"/>
@@ -132,8 +144,8 @@ const Cart = () => {
                                             </div>
 
                                             <div className="item-middle">
-                                                <div className="price-dis">{item.product.price.toLocaleString()} {item.currency}</div>
-                                                <div className="price-noDis">{item.product.originalPrice.toLocaleString()} {item.currency}</div>
+                                                <div className="price-dis">{item.product.price.toLocaleString()} {item.product.currency}</div>
+                                                <div className="price-noDis">{item.product.originalPrice.toLocaleString()} {item.product.currency}</div>
                                                 <div className="price-percent">-{calculateDiscountPercentage(item.product.originalPrice, item.product.price)}%</div>
                                             </div>
 
