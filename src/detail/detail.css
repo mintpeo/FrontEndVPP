@@ -18,6 +18,12 @@
   height: auto;
   width: 100%;
 }
+#detail .container .img-dt .img-sub .swiper-button-prev {
+  color: black;
+}
+#detail .container .img-dt .img-sub .swiper-button-next {
+  color: black;
+}
 #detail .container .img-dt .img-sub .swiper-slide {
   transition: all 0.4s ease;
 }
@@ -88,7 +94,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: url("src/assets/icon-discount-1.png") no-repeat center;
+  background: url("https://res.cloudinary.com/dqzuuzi8z/image/upload/v1773989372/icon-discount_fverzf.png") no-repeat center;
   width: 68px;
   height: 68px;
   white-space: nowrap;
@@ -116,7 +122,8 @@
   cursor: pointer;
 }
 #detail .container .info-dt .type .type-color.active {
-  border-color: #2659f3;
+  border-color: #950c44;
+  border-width: 3px;
 }
 #detail .container .info-dt .amount {
   padding: 1rem 0;

@@ -19,7 +19,7 @@ import useFetch from "../hooks/useFetch.js";
 const Navbar = () => {
     const {data:cates} = useFetch(`${API_URL}/category/all`);
     const [loginStatus, setLoginStatus] = useState("");
-    const [user, setUser] = useState();
+    const user = GetStoredUser();
 
     const location = useLocation();
     const navigate = useNavigate();
@@ -29,7 +29,6 @@ const Navbar = () => {
         const status = localStorage.getItem(KEY_LOGGED);
         if (status) {
             setLoginStatus("true");
-            setUser(GetStoredUser());
         }
     }, [location]);
 
@@ -66,7 +65,7 @@ const Navbar = () => {
 
     // No Login When Click Cart
     const clickCart = () => {
-      if (user?.id) return navigate("/cart");
+      if (user?.email) return navigate("/cart");
       else {
           alert("Bạn chưa đăng nhập tài khoản!");
           navigate("/user/login");
