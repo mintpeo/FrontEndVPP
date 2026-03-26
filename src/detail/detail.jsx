@@ -1,29 +1,61 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import './detail.css';
 
-import {useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import useFetch from "../hooks/useFetch.js";
-import {API_URL} from "../service/API_URL.jsx";
+import {API_URL, INFO_USER, KEY_LOGGED} from "../service/API_URL.jsx";
 import {Swiper, SwiperSlide} from "swiper/react";
 import {Autoplay, Navigation} from "swiper/modules";
 
 import { BsCart3 } from "react-icons/bs";
 import { HiTicket } from "react-icons/hi2";
+import DiscountPricePer from "../components/discountPricePer.jsx";
+import {GetStoredUser} from "../service/GetStoredUser.jsx";
 
 const Detail = () => {
     // Get id product from url
     const {id} = useParams();
     const {data: product, loading: loading} = useFetch(`${API_URL}/product/${id}`);
+    const user = GetStoredUser();
+    const navigate = useNavigate();
 
+    // Choose Type
+    const [type, setType] = useState(null);
     // Save index img-main and img-sub
     const [activeIndex, setActiveIndex] = useState(0);
     const [numTypeCol, setNumTypeCol] = useState(0);
-
     // Quantity
     const [quantity, setQuantity] = useState(1);
-
     // Copy Voucher
     const [choose, setChoose] = useState(0);
+
+    // Add To Cart
+    const addToCart = async() => {
+        const bodyCart = {
+            user_id: user.id,
+            product_id: product.id,
+            quantity: quantity,
+            image: product.images[0].image,
+            type: type || product.colors[0].info.name
+        }
+
+        try {
+            const res = await fetch(`${API_URL}/cart/add`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(bodyCart),
+            });
+
+            if (res.ok) {
+                alert("Thêm vào giỏ hàng thành công.");
+                navigate("/cart")
+            }
+        } catch (error) {
+            console.log("Error Add To Cart: ", error);
+        }
+    };
 
     // Choose Type Col
     const handleTypeCol = (imgColo) => {
@@ -60,8 +92,6 @@ const Detail = () => {
         if (sign === "-") setQuantity(quantity - 1);
         else setQuantity(quantity + 1);
     }
-
-    console.log(product)
 
     // Wait to load data
     if (loading) {
@@ -129,7 +159,7 @@ const Detail = () => {
                             <div className="price-dis">{product.price.toLocaleString()}{product.currency}</div>
                             <div className="price-noDis">{product.originalPrice.toLocaleString()}{product.currency}</div>
                         </div>
-                        <div className="dis-per">Tiết kiệm <strong>35%</strong></div>
+                        <div className="dis-per">Tiết kiệm <strong><DiscountPricePer originalPrice={product.originalPrice} discountedPrice={product.price} /></strong></div>
                     </div>
 
                     {/* Type */}
@@ -140,6 +170,7 @@ const Detail = () => {
                                     <div onClick={() => {
                                         handleTypeCol(item.image);
                                         setNumTypeCol(index);
+                                        setType(item.info.name);
                                     }} className={`type-color ${handleChooseType(index) ? 'active' : ''}`} style={{backgroundColor: item.info.code}}></div>
                                 ))}
                             </div>
@@ -157,7 +188,7 @@ const Detail = () => {
                     </div>
 
                     <div className="addCart">
-                        <button className="btnCart"><i className="icon"><BsCart3/></i> Thêm vào giỏ</button>
+                        <button onClick={() => addToCart()} className="btnCart"><i className="icon"><BsCart3/></i> Thêm vào giỏ</button>
                         <button className="btnCart btnBlue">Mua ngay</button>
                     </div>
                 </div>
