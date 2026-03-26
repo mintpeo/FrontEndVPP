@@ -8,8 +8,6 @@ import {FaFacebook} from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 const Sign = () => {
-    const API = API_URL;
-
     const navigate = useNavigate();
 
     const [email, setEmail] = useState("");
@@ -22,7 +20,7 @@ const Sign = () => {
         e.preventDefault();
 
         // Check duplication
-        const checkRes = await fetch(`${API}/user/checkEmail?email=${email}`);
+        const checkRes = await fetch(`${API_URL}/user/checkEmail?email=${email}`);
         const existUsers = await checkRes.json();
 
         if (existUsers) {
@@ -40,7 +38,7 @@ const Sign = () => {
         };
 
         try {
-            const res = await fetch(`${API}/user/sign`, {
+            const res = await fetch(`${API_URL}/user/sign`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

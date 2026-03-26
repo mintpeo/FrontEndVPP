@@ -36,6 +36,7 @@
           margin-bottom: 1rem;
 
           .item-img {
+            cursor: pointer;
             width: auto;
             height: 5rem;
           }
@@ -53,6 +54,7 @@
               text-align: left;
 
               .name {
+                cursor: pointer;
                 white-space: nowrap;
                 font-size: 1rem;
                 font-weight: 500;

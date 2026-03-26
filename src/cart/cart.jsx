@@ -6,15 +6,21 @@ import { MdLocalShipping } from "react-icons/md";
 import {API_URL, QUANTITY_CART} from "../service/API_URL.jsx";
 import {GetStoredUser} from "../service/GetStoredUser.jsx";
 import useFetch from "../hooks/useFetch.js";
+import DiscountPricePer from "../components/discountPricePer.jsx";
 
 const Cart = () => {
     const user = GetStoredUser();
-    // Load list carts
     const {data: serverCarts} = useFetch(`${API_URL}/cart?userId=${user.id}`);
     const [carts, setCarts] = useState([]);
     const [selectedItems, setSelectedItems] = useState([]);
-
     const navigate = useNavigate();
+
+    console.log(carts)
+
+    // Detail
+    const handleToDetail = (id) => {
+        navigate(`/detail/${id}`);
+    }
 
     // Clone list carts
     useEffect(() => {
@@ -104,16 +110,6 @@ const Cart = () => {
         }
     };
 
-    console.log(carts)
-
-    //  Calculate Dis %
-    const calculateDiscountPercentage = (originalPrice, discountedPrice) => {
-        let savings = originalPrice - discountedPrice;
-        let percentage = (savings / originalPrice) * 100;
-
-        return Math.trunc(percentage);
-    }
-
     // Click Check Out
     const clickCheckOut = () => {
       if (selectedItems && selectedItems.length === 0) alert("Vui lòng chọn sản phẩm để tiến hành đặt hàng!");
@@ -138,18 +134,18 @@ const Cart = () => {
                                                 onChange={() => toggleSelectItem(item.id)}
                                             />
 
-                                            <img src={item.image} alt="" className="item-img"/>
+                                            <img onClick={() => handleToDetail(item.product_id)} src={item.image} alt="" className="item-img"/>
 
                                             <div className="item-cart">
                                                 <div className="item-left">
-                                                    <div className="name" title="222">{item.product.name}</div>
+                                                    <div onClick={() => handleToDetail(item.product_id)} className="name" title="222">{item.product.name}</div>
                                                     {item.type && item.type.length > 0 ? (<div className="type">Loại: {item.type}</div>) : ("")}
                                                 </div>
 
                                                 <div className="item-middle">
-                                                    <div className="price-dis">{item.product.price.toLocaleString()} {item.product.currency}</div>
-                                                    <div className="price-noDis">{item.product.originalPrice.toLocaleString()} {item.product.currency}</div>
-                                                    <div className="price-percent">-{calculateDiscountPercentage(item.product.originalPrice, item.product.price)}%</div>
+                                                    <div className="price-dis">{item.product.price.toLocaleString()}{item.product.currency}</div>
+                                                    <div className="price-noDis">{item.product.originalPrice.toLocaleString()}{item.product.currency}</div>
+                                                    <div className="price-percent"><DiscountPricePer originalPrice={item.product.originalPrice} discountedPrice={item.product.price} sub={true} /></div>
                                                 </div>
 
                                                 <div className="item-right">

@@ -31,17 +31,14 @@ const Login = () => {
             if (!res.ok) {
                 const message = await res.text();
                 alert(message);
-                return;
+            } else {
+                const user = await res.json(); // array
+                // Save Info User
+                localStorage.setItem(KEY_LOGGED, "true");
+                localStorage.setItem(INFO_USER, JSON.stringify(user)); // array -> Object
+                alert("Đăng nhập thành công!");
+                navigate("/");
             }
-
-            const user = await res.json(); // array
-
-            // Save Info User
-            localStorage.setItem(KEY_LOGGED, "true");
-            localStorage.setItem(INFO_USER, JSON.stringify(user)); // array -> Object
-
-            alert("Đăng nhập thành công!");
-            navigate("/");
 
         } catch (error) {
             console.log("Error Login:", error);
