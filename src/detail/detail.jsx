@@ -50,7 +50,7 @@ const Detail = () => {
 
             if (res.ok) {
                 alert("Thêm vào giỏ hàng thành công.");
-                navigate("/cart")
+                // navigate("/cart")
             }
         } catch (error) {
             console.log("Error Add To Cart: ", error);

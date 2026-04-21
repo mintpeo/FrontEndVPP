@@ -23,6 +23,7 @@ const Cart = () => {
     }
 
     // Clone list carts
+    // Tao list de thuan tien cho viec up quantity (nhanh)
     useEffect(() => {
         if (serverCarts && serverCarts.length > 0) {
             const clone = serverCarts.map(item => ({...item}))
@@ -72,7 +73,7 @@ const Cart = () => {
 
         if (newQuantity < 1) return;
 
-        // for each phai F5 moi update
+        // for each phai F5 moi update nen dung map
         const upNewQuan = carts.map(item => {
             if (item.id === id) return {...item, quantity: newQuantity};
             return item;
@@ -97,12 +98,18 @@ const Cart = () => {
 
         if (isConfirm) {
             try {
-                const res = await fetch(`${API_URL}/carts/${id}`, {
+                const res = await fetch(`${API_URL}/cart/delete`, {
                     method: "DELETE",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({
+                        id: id,
+                        userId: user.id
+                    }),
                 });
 
                 if (res.ok) {
-                    window.location.reload();
+                    // window.location.reload();
+                    setCarts((prevCarts) => prevCarts.filter(item => item.id !== id));
                 }
             } catch (e) {
                 console.log("ERROR REMOVE_FROM_CART ", e);
@@ -124,7 +131,7 @@ const Cart = () => {
                     carts && carts.length > 0 ? (
                         <div className="main-cart">
                             <div className="container-left">
-                                {carts.slice().sort((a, b) => a.id - b.id)
+                                {carts.slice().sort((a, b) => b.id - a.id)
                                     .map(item => (
                                         <div className="list-cart">
                                             <input
