@@ -11,7 +11,7 @@ import { FaUser } from "react-icons/fa";
 import { BsFillBagFill } from "react-icons/bs";
 import { FaChevronDown } from "react-icons/fa";
 
-import {API_URL, INFO_USER, IS_LOGGED, QUANTITY_CART} from "../service/API_URL.jsx";
+import {API_URL, INFO_USER, KEY_LOGGED, QUANTITY_CART} from "../service/API_URL.jsx";
 import {GetStoredUser} from '../service/GetStoredUser.jsx';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import useFetch from "../hooks/useFetch.js";
@@ -26,7 +26,7 @@ const Navbar = () => {
 
     // Login Status
     useEffect(() => {
-        const status = localStorage.getItem(IS_LOGGED);
+        const status = localStorage.getItem(KEY_LOGGED);
         if (status) {
             setLoginStatus("true");
         }
@@ -34,7 +34,9 @@ const Navbar = () => {
 
     // Button Logout
     const logout = () => {
-      localStorage.clear();
+      localStorage.removeItem(KEY_LOGGED);
+      localStorage.removeItem(INFO_USER);
+      localStorage.removeItem(QUANTITY_CART);
       navigate("/");
       window.location.reload();
     };

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import './sign.css'
-import {API_URL} from "../../service/API_URL.jsx";
-import LoadingModal from '../../modal/LoadingModal.jsx';
+import {API_URL, INFO_USER, KEY_LOGGED} from "../../service/API_URL.jsx";
 
 import {FaGoogle} from "react-icons/fa6";
 import {FaFacebook} from "react-icons/fa";
@@ -16,7 +15,6 @@ const Sign = () => {
     const [lastName, setLastName] = useState("");
     const [firstName, setFirstName] = useState("");
     const [phone, setPhone] = useState("");
-    const [isLoading, setIsLoading] = useState(false);
 
     const sign = async (e) => {
         e.preventDefault();
@@ -28,7 +26,7 @@ const Sign = () => {
         if (existUsers) {
             alert("Email này đã có người sử dụng!");
             return;
-        } else setIsLoading(true);
+        }
 
         // Create new user
         const newUser = {
@@ -39,19 +37,41 @@ const Sign = () => {
             phone: phone,
         };
 
-        const sendCode = await fetch(`${API_URL}/authVerify/sendCode?email=${email}`, {
-            method: "POST"
-        });
-        const isSend = await sendCode.json();
-        if (isSend) {
-            setIsLoading(false);
-            navigate("/user/verify", {state: {newUser: newUser}});
+        try {
+            const res = await fetch(`${API_URL}/user/sign`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(newUser),
+            });
+
+            if (res.ok) {
+                const loginUser = await fetch(`${API_URL}/user/login`, {
+                    method: "Post",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        pass: password
+                    }),
+                });
+
+                const logined = await loginUser.json();
+
+                localStorage.setItem(KEY_LOGGED, "true");
+                localStorage.setItem(INFO_USER, JSON.stringify(logined));
+                alert("Đăng ký thành công.");
+                navigate("/");
+            }
+        } catch (error) {
+            console.log("Error SignUp: ", error);
         }
     };
 
     return (
         <div id="sign">
-            <LoadingModal isLoading={isLoading} />
             <div className="container">
                 <form className="table-login" onSubmit={sign}>
                     <div className="title">Đăng ký</div>
@@ -79,14 +99,14 @@ const Sign = () => {
 
                     <div className="form">
                         <div className="name">Mật khẩu<span className="required">(*)</span>:</div>
-                        <div className="input-form"><input type="password" minLength={6} placeholder="Nhập Mật khẩu" onChange={(e) => setPassword(e.target.value)} required/></div>
+                        <div className="input-form"><input type="password" placeholder="Nhập Mật khẩu" onChange={(e) => setPassword(e.target.value)} required/></div>
                     </div>
 
                     <div className="forget-pass"></div>
 
                     <button className="btn-login" type="submit">Đăng ký</button>
 
-                    <div className="forget-pass">Bạn đã có tài khoản? <b onClick={() => navigate("/user/login")}>Đăng nhập tại đây</b></div>
+                    <div className="forget-pass">Bạn đã có tài khoản <b onClick={() => navigate("/user/login")}>Đăng nhập tại đây</b></div>
 
                     <div className="login-more">
                         <div className="btn" style={{background: "#DE3F32"}}>

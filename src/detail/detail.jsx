@@ -1,9 +1,9 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import './detail.css';
 
 import {useNavigate, useParams} from "react-router-dom";
 import useFetch from "../hooks/useFetch.js";
-import {API_URL} from "../service/API_URL.jsx";
+import {API_URL, INFO_USER, KEY_LOGGED} from "../service/API_URL.jsx";
 import {Swiper, SwiperSlide} from "swiper/react";
 import {Autoplay, Navigation} from "swiper/modules";
 
@@ -17,7 +17,7 @@ const Detail = () => {
     const {id} = useParams();
     const {data: product, loading: loading} = useFetch(`${API_URL}/product/${id}`);
     const user = GetStoredUser();
-    // const navigate = useNavigate();
+    const navigate = useNavigate();
 
     // Choose Type
     const [type, setType] = useState(null);
@@ -50,7 +50,7 @@ const Detail = () => {
 
             if (res.ok) {
                 alert("Thêm vào giỏ hàng thành công.");
-                // navigate("/cart")
+                navigate("/cart")
             }
         } catch (error) {
             console.log("Error Add To Cart: ", error);
