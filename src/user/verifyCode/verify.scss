@@ -1,7 +1,9 @@
 #verify {
   background: linear-gradient(90deg, #09bce4 0%, #2659f3 100%);
+  min-height: 50vh;
 
   .container {
+    padding: 5rem;
     justify-items: center;
 
     .table {
@@ -37,12 +39,14 @@
 
         span {
           color: black;
+          font-weight: 700;
         }
 
         .text {
           display: flex;
           justify-content: space-between;
-          font-size: 1.1rem;
+          font-size: 1rem;
+          font-weight: 200;
         }
 
         .placeCode {
@@ -62,6 +66,10 @@
                 border-radius: .5rem;
                 border: 1px solid black;
                 text-align: center;
+
+                &:focus {
+                  outline: none !important;
+                }
               }
             }
           }
@@ -75,8 +83,9 @@
           font-size: 1.2rem;
           width: 100%;
           height: 3rem;
-          border-radius: .5rem;
+          border-radius: 1rem;
           border: none;
+          background-color: #f5df4d;
         }
       }
     }

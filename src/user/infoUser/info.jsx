@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import './info.css'
-import {INFO_USER, KEY_LOGGED} from "../../service/API_URL.jsx";
+import {INFO_USER, IS_LOGGED} from "../../service/API_URL.jsx";
 
 import { IoLogoAppleAr } from "react-icons/io5";
 import { FaUser } from "react-icons/fa";
@@ -19,8 +19,6 @@ import Member from './rightPage/member/member.jsx';
 import {useNavigate} from "react-router-dom";
 
 const Info = () => {
-    const KEYLOGGED = KEY_LOGGED;
-    const INFOUSER = INFO_USER;
     const navigate = useNavigate();
 
     const [user] = useState(GetStoredUser);
@@ -81,8 +79,7 @@ const Info = () => {
                             </li>
 
                             <li className="item" onClick={() => {
-                                localStorage.removeItem(KEYLOGGED);
-                                localStorage.removeItem(INFOUSER);
+                                localStorage.clear();
                                 navigate("/");
                                 window.location.reload();
                             }}>

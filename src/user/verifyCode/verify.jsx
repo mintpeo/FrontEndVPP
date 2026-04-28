@@ -1,19 +1,14 @@
-import React, {useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import './verify.css'
 
 import { FaAngleLeft } from "react-icons/fa";
 import { useLocation, useNavigate} from "react-router-dom";
-import {API_URL, INFO_USER, KEY_LOGGED} from "../../service/API_URL.jsx";
+import {API_URL, INFO_USER, IS_LOGGED} from "../../service/API_URL.jsx";
+import LoadingModal from "../../modal/LoadingModal.jsx";
 
 const Verify = () => {
     const location = useLocation();
     const newUser = location.state.newUser;
-    console.log(newUser);
-
-    const navigate = useNavigate();
-
-    const [otp, setOtp] = useState(new Array(6).fill(""));
-
     // const newUser = {
     //     email: "123",
     //     password: "123",
@@ -21,6 +16,32 @@ const Verify = () => {
     //     firstName: "tran",
     //     phone: "1",
     // }
+
+    const navigate = useNavigate();
+
+    const [isLoading, setIsLoading] = useState(false);
+    const [otp, setOtp] = useState(new Array(6).fill(""));
+    const [time, setTime] = useState(60);
+    const inputRefs = useRef([]);
+
+    useEffect(() => {
+        if (time <= 0) return;
+
+        const timer = setInterval(() => {
+            setTime((prevTime) => prevTime - 1);
+        }, 1000);
+
+        return () => clearInterval(timer);
+    }, [time]);
+
+    const handleResendCode = async () => {
+        if (time > 0) return;
+        alert("Chúng tôi đã gửi lại mã xác minh cho bạn!");
+        setTime(60);
+        await fetch(`${API_URL}/authVerify/sendCode?email=${newUser.email}`, {
+            method: "POST"
+        });
+    };
 
     const handleChange = (element, index) => {
         const value = element.value;
@@ -35,56 +56,73 @@ const Verify = () => {
         // if (value && element.nextSibling) {
         //     element.nextSibling.focus();
         // }
+        if (value && index < 5) {
+            inputRefs.current[index + 1].focus();
+        }
     };
 
-    const signUp = async(e) => {
+    const handleKeyDown = (e, index) => {
+        // TỰ ĐỘNG QUAY LẠI Ô TRƯỚC KHI BẤM BACKSPACE
+        if (e.key === "Backspace" && !otp[index] && index > 0) {
+            inputRefs.current[index - 1].focus();
+        }
+    };
+
+    const signUp = async (e) => {
         e.preventDefault();
+        setIsLoading(true);
 
         const code = otp.join("");
-        const verify = await fetch(`${API_URL}/auth/verifyCode?email=${newUser.email}&code=${code}`, {
+        const verify = await fetch(`${API_URL}/authVerify/verifyCode?email=${newUser.email}&code=${code}`, {
             method: "POST"
         });
         const isVerify = await verify.json();
-        console.log(newUser.email);
-        console.log(code);
 
-        if (!isVerify) return;
-        alert("DONE");
-        // try {
-        //     const res = await fetch(`${API_URL}/user/sign`, {
-        //         method: "POST",
-        //         headers: {
-        //             "Content-Type": "application/json",
-        //         },
-        //         body: JSON.stringify(newUser),
-        //     });
-        //
-        //     if (res.ok) {
-        //         const loginUser = await fetch(`${API_URL}/user/login`, {
-        //             method: "Post",
-        //             headers: {
-        //                 "Content-Type": "application/json",
-        //             },
-        //             body: JSON.stringify({
-        //                 email: email,
-        //                 pass: password
-        //             }),
-        //         });
-        //
-        //         const logined = await loginUser.json();
-        //
-        //         localStorage.setItem(KEY_LOGGED, "true");
-        //         localStorage.setItem(INFO_USER, JSON.stringify(logined));
-        //         alert("Đăng ký thành công.");
-        //         navigate("/");
-        //     }
-        // } catch (error) {
-        //     console.log("Error SignUp: ", error);
-        // }
+        if (!isVerify) {
+            setIsLoading(false);
+            alert("Vui lòng thử lại hoặc mã đã hết hạn!");
+            return;
+        }
+
+        // Verify = True
+        try {
+            const signUp = await fetch(`${API_URL}/user/sign`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(newUser),
+            });
+
+            const data = await signUp.json();
+
+            if (signUp.ok) {
+                setIsLoading(false);
+
+                const authData = {
+                    accessToken: data.accessToken,
+                    refreshToken: data.refreshToken,
+                    expiresAt: Date.now() + (data.expiresIn * 1000), // Tính ra thời điểm milisec
+                    id: data.id,
+                    email: data.email,
+                    firstName: data.firstName,
+                    lastName: data.lastName,
+                    role: "user"
+                }
+
+                localStorage.setItem(IS_LOGGED, "true");
+                localStorage.setItem(INFO_USER, JSON.stringify(authData));
+                alert("Đăng ký thành công.");
+                navigate("/");
+            }
+        } catch (error) {
+            console.log("Error SignUp: ", error);
+        }
     }
 
     return (
         <div id="verify">
+            <LoadingModal isLoading={isLoading} />
             <div className="container">
                 <form className="table" onSubmit={signUp}>
                     {/* HEADER */}
@@ -101,18 +139,24 @@ const Verify = () => {
                                 {otp.map((data, index) => (
                                     <li className="item-place">
                                         <input className="value"
-                                            key={index}
-                                            type="text"
-                                            maxLength="1"
-                                            value={data}
-                                            onChange={e => handleChange(e.target, index)}
-                                            onFocus={e => e.target.select()} // Tự động bôi đen để dễ nhập đè
+                                               key={index}
+                                               type="text"
+                                               inputMode="numeric"
+                                               maxLength="1"
+                                               value={data}
+                                               ref={(el) => (inputRefs.current[index] = el)}
+                                               onChange={e => handleChange(e.target, index)}
+                                               onKeyDown={(e) => handleKeyDown(e, index)}
                                         />
                                     </li>
                                 ))}
                             </ul>
                         </div>
-                        <div className="text">Bạn không nhận được mã?<span>TIME</span></div>
+                        <div className="text">
+                            <p style={{cursor: time <= 0 ? "pointer" : "not-allowed"}}
+                               onClick={handleResendCode}>Bạn không nhận được mã? Ấn vào đây</p>
+                            <span>{time}s</span>
+                        </div>
                     </div>
 
                     {/* BUTTON SUBMIT */}

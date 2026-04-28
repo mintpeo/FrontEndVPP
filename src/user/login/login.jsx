@@ -4,7 +4,7 @@ import './login.css'
 import { FaGoogle } from "react-icons/fa6";
 import { FaFacebook } from "react-icons/fa";
 
-import {API_URL, INFO_USER, KEY_LOGGED} from "../../service/API_URL.jsx";
+import {API_URL, INFO_USER, IS_LOGGED} from "../../service/API_URL.jsx";
 import {useNavigate} from "react-router-dom";
 
 const Login = () => {
@@ -24,7 +24,7 @@ const Login = () => {
                 },
                 body: JSON.stringify({
                     email: email,
-                    pass: password
+                    password: password
                 }),
             });
 
@@ -32,10 +32,24 @@ const Login = () => {
                 const message = await res.text();
                 alert(message);
             } else {
-                const user = await res.json(); // array
+                const data = await res.json(); // array
+                const authData = {
+                    accessToken: data.accessToken,
+                    refreshToken: data.refreshToken,
+                    expiresAt: Date.now() + (data.expiresIn * 1000), // Do Date.now() Tra ve mili s, data.expiresIn tra ve giay (s) nen phai * 1000
+                    id: data.id,
+                    email: data.email,
+                    firstName: data.firstName,
+                    lastName: data.lastName,
+                    phone: data.phone,
+                    address: data.address,
+                    dateOfBirth: data.dateOfBirth,
+                    role: "user"
+                }
+
                 // Save Info User
-                localStorage.setItem(KEY_LOGGED, "true");
-                localStorage.setItem(INFO_USER, JSON.stringify(user)); // array -> Object
+                localStorage.setItem(IS_LOGGED, "true");
+                localStorage.setItem(INFO_USER, JSON.stringify(authData)); // array -> Object
                 alert("Đăng nhập thành công!");
                 navigate("/");
             }
@@ -64,7 +78,7 @@ const Login = () => {
 
                    <button className="btn-login" type="sumbit">Đăng nhập</button>
 
-                   <div className="forget-pass">Bạn chưa có tài khoản <b onClick={() => navigate("/user/sign")}>Đăng ký tại đây</b></div>
+                   <div className="forget-pass">Bạn chưa có tài khoản? <b onClick={() => navigate("/user/sign")}>Đăng ký tại đây</b></div>
 
                    <div className="login-more">
                        <div className="btn" style={{background: "#DE3F32"}}>

@@ -28,8 +28,7 @@ const Sign = () => {
         if (existUsers) {
             alert("Email này đã có người sử dụng!");
             return;
-        }
-        setIsLoading(true);
+        } else setIsLoading(true);
 
         // Create new user
         const newUser = {
@@ -40,7 +39,7 @@ const Sign = () => {
             phone: phone,
         };
 
-        const sendCode = await fetch(`${API_URL}/auth/sendCode?email=${email}`, {
+        const sendCode = await fetch(`${API_URL}/authVerify/sendCode?email=${email}`, {
             method: "POST"
         });
         const isSend = await sendCode.json();
@@ -80,14 +79,14 @@ const Sign = () => {
 
                     <div className="form">
                         <div className="name">Mật khẩu<span className="required">(*)</span>:</div>
-                        <div className="input-form"><input type="password" placeholder="Nhập Mật khẩu" onChange={(e) => setPassword(e.target.value)} required/></div>
+                        <div className="input-form"><input type="password" minLength={6} placeholder="Nhập Mật khẩu" onChange={(e) => setPassword(e.target.value)} required/></div>
                     </div>
 
                     <div className="forget-pass"></div>
 
                     <button className="btn-login" type="submit">Đăng ký</button>
 
-                    <div className="forget-pass">Bạn đã có tài khoản <b onClick={() => navigate("/user/login")}>Đăng nhập tại đây</b></div>
+                    <div className="forget-pass">Bạn đã có tài khoản? <b onClick={() => navigate("/user/login")}>Đăng nhập tại đây</b></div>
 
                     <div className="login-more">
                         <div className="btn" style={{background: "#DE3F32"}}>
