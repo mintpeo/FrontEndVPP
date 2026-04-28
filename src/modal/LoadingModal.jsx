@@ -1,5 +1,5 @@
 import React from 'react';
-import './LoadingModal.css';
+import './loadingModal.css';
 
 const LoadingModal = ({ isLoading }) => {
     if (!isLoading) return null;
