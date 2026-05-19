@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import './detail.css';
 
-import {useNavigate, useParams} from "react-router-dom";
+import {useParams} from "react-router-dom";
 import useFetch from "../hooks/useFetch.js";
 import {API_URL} from "../service/API_URL.jsx";
 import {Swiper, SwiperSlide} from "swiper/react";
@@ -11,16 +11,18 @@ import { BsCart3 } from "react-icons/bs";
 import { HiTicket } from "react-icons/hi2";
 import DiscountPricePer from "../components/discountPricePer.jsx";
 import {GetStoredUser} from "../service/GetStoredUser.jsx";
+import LoadingModal from "../modal/LoadingModal.jsx";
 
 const Detail = () => {
     // Get id product from url
     const {id} = useParams();
     const {data: product, loading: loading} = useFetch(`${API_URL}/product/${id}`);
-    const user = GetStoredUser();
+    const token = GetStoredUser();
     // const navigate = useNavigate();
+    console.log("Detail Product", product)
 
     // Choose Type
-    const [type, setType] = useState(null);
+    const [type, setType] = useState("");
     // Save index img-main and img-sub
     const [activeIndex, setActiveIndex] = useState(0);
     const [numTypeCol, setNumTypeCol] = useState(0);
@@ -28,15 +30,24 @@ const Detail = () => {
     const [quantity, setQuantity] = useState(1);
     // Copy Voucher
     const [choose, setChoose] = useState(0);
+    const [isLoading, setIsLoading] = useState(false);
 
     // Add To Cart
     const addToCart = async() => {
+        setIsLoading(true);
+
+        const hasColors = product.colors && product.colors.length > 0;
+        const productType = type || (hasColors ? product.colors[0].name : "" );
+
         const bodyCart = {
-            user_id: user.id,
-            product_id: product.id,
+            productId: product.id,
+            image: product.images[0],
             quantity: quantity,
-            image: product.images[0].image,
-            type: type || product.colors[0].info.name
+            type: productType,
+            name: product.name,
+            price: product.price,
+            originalPrice: product.originalPrice,
+            currency: product.currency
         }
 
         try {
@@ -44,6 +55,7 @@ const Detail = () => {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    "AT": token.accessToken
                 },
                 body: JSON.stringify(bodyCart),
             });
@@ -52,6 +64,8 @@ const Detail = () => {
                 alert("Thêm vào giỏ hàng thành công.");
                 // navigate("/cart")
             }
+
+            setIsLoading(false);
         } catch (error) {
             console.log("Error Add To Cart: ", error);
         }
@@ -62,7 +76,7 @@ const Detail = () => {
         const listImage = [...product.images];
 
         for (let i = 1; i < listImage.length; i++) {
-            if (imgColo === listImage[i].image) {
+            if (imgColo === listImage[i]) {
                 setActiveIndex(i);
             }
         }
@@ -104,10 +118,11 @@ const Detail = () => {
 
     return (
         <div id="detail">
+            <LoadingModal isLoading={isLoading} />
             <div className="container">
                 {/* IMAGE */}
                 <div className="img-dt">
-                    <img src={product.images[activeIndex].image} alt="" className="img-main"/>
+                    <img src={product.images[activeIndex]} alt="" className="img-main"/>
 
                     {/* IMAGES SUB */}
                     <div className="img-sub">
@@ -129,7 +144,7 @@ const Detail = () => {
                                         <div className="img-list" onClick={() => {
                                             setActiveIndex(index);
                                         }}>
-                                            <img className={`img-item ${activeIndex === index ? 'active' : ''}`} src={item.image} alt="img-sub" />
+                                            <img className={`img-item ${activeIndex === index ? 'active' : ''}`} src={item} alt="img-sub" />
                                         </div>
                                     </SwiperSlide>
                                 ))
@@ -170,8 +185,8 @@ const Detail = () => {
                                     <div onClick={() => {
                                         handleTypeCol(item.image);
                                         setNumTypeCol(index);
-                                        setType(item.info.name);
-                                    }} className={`type-color ${handleChooseType(index) ? 'active' : ''}`} style={{backgroundColor: item.info.code}}></div>
+                                        setType(item.name);
+                                    }} className={`type-color ${handleChooseType(index) ? 'active' : ''}`} style={{backgroundColor: item.code}}></div>
                                 ))}
                             </div>
                         ) : ("")

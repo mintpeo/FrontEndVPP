@@ -63,7 +63,7 @@ const Navbar = () => {
 
     // No Login When Click Cart
     const clickCart = () => {
-      if (user?.email) return navigate("/cart");
+      if (user?.lastName) return navigate("/cart");
       else {
           alert("Bạn chưa đăng nhập tài khoản!");
           navigate("/user/login");

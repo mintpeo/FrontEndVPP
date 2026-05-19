@@ -26,6 +26,8 @@ const Home = () => {
     const {data: infoSales} = useFetch(`${API_URL}/infoSale/all`);
     const {data: banners} = useFetch(`${API_URL}/banner/all`);
 
+    console.log(products)
+
     // Navigate to detail
     const navigate = useNavigate();
     const handleToDetail = (id) => {
@@ -96,7 +98,7 @@ const Home = () => {
                                 products.slice(0, 5).map((item) => (
                                     <div className="container-product">
                                         <div className="name" onClick={() => handleToDetail(item.id)}><a title={item.name}>{item.name}</a></div>
-                                        <div className="img" onClick={() => handleToDetail(item.id)}><a title={item.name}><img src={item.images[0].image} alt=""/></a></div>
+                                        <div className="img" onClick={() => handleToDetail(item.id)}><a title={item.name}><img src={item.images[0]} alt=""/></a></div>
                                         <div className="price">
                                             <p className="price-dis">{item.price.toLocaleString()}{item.currency}</p>
                                             <p className="price-noDis">{item.originalPrice.toLocaleString()}{item.currency}</p>
@@ -135,7 +137,7 @@ const Home = () => {
                         {
                             products.slice(0, 5).map((item) => (
                             <div className="item" onClick={() => handleToDetail(item.id)}>
-                                <div className="item-img"><img src={item.images[0].image} alt="item-img"/></div>
+                                <div className="item-img"><img src={item.images[0]} alt="item-img"/></div>
                                 <div className="item-stock">
                                     <div className="icon"><AiOutlineStock />Số lượng: {item.stock}</div>
                                 </div>

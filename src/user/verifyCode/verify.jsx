@@ -6,6 +6,7 @@ import { useLocation, useNavigate} from "react-router-dom";
 import {API_URL, INFO_USER, IS_LOGGED} from "../../service/API_URL.jsx";
 import LoadingModal from "../../modal/LoadingModal.jsx";
 
+// canh 6 o ra giua
 const Verify = () => {
     const location = useLocation();
     const newUser = location.state.newUser;
@@ -103,11 +104,7 @@ const Verify = () => {
                     accessToken: data.accessToken,
                     refreshToken: data.refreshToken,
                     expiresAt: Date.now() + (data.expiresIn * 1000), // Tính ra thời điểm milisec
-                    id: data.id,
-                    email: data.email,
-                    firstName: data.firstName,
                     lastName: data.lastName,
-                    role: "user"
                 }
 
                 localStorage.setItem(IS_LOGGED, "true");
