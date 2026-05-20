@@ -1,15 +1,18 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import './user.css';
-import {GetStoredUser} from "../../../../service/GetStoredUser.jsx";
 import {API_URL, INFO_USER} from "../../../../service/API_URL.jsx";
 
-const User = () => {
-    const [user, setUser] = useState(GetStoredUser);
+const User = ({infoUser}) => {
+    const [user, setUser] = useState([]);
     const setLastName = (e) => {setUser({...user, lastName: e.target.value})};
     const setFirstName = (e) => {setUser({...user, firstName: e.target.value})};
     const setPhone = (e) => {setUser({...user, phone: e.target.value})};
     const setDateOfBirth = (e) => {setUser({...user, dateOfBirth: e.target.value})};
     const setAddress = (e) => {setUser({...user, address: e.target.value})};
+
+    useEffect(() => {
+        setUser(infoUser);
+    }, [])
 
     const updateUserInfo = async () => {
         const newInfo = {

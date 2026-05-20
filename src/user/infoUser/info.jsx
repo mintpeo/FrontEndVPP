@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import './info.css'
-import {INFO_USER, IS_LOGGED} from "../../service/API_URL.jsx";
+import {API_URL, INFO_USER, IS_LOGGED} from "../../service/API_URL.jsx";
 
 import { IoLogoAppleAr } from "react-icons/io5";
 import { FaUser } from "react-icons/fa";
@@ -21,17 +21,42 @@ import {useNavigate} from "react-router-dom";
 const Info = () => {
     const navigate = useNavigate();
 
-    const [user] = useState(GetStoredUser);
+    const token = GetStoredUser();
+    const [user, setUser] = useState([]);
+
+    useEffect(() => {
+        const getInfoUser = async () => {
+            try {
+                const res = await fetch(`${API_URL}/user/info`, {
+                    method: "GET",
+                    headers: {
+                        "AT": token.accessToken
+                    }
+                });
+
+                const infoUser = await res.json();
+                setUser(infoUser);
+            } catch (e) {
+                console.log("Error: Info User", e);
+            }
+        }
+        getInfoUser();
+    }, [])
+
+    console.log(user);
+
     const [btnPage, setBtnPage] = useState(1);
 
     const Page = () => {
       switch (btnPage) {
           case 1: return <AccountBoxs />
-          case 2: return <User />
+          case 2: return <User infoUser={user} />
           case 3: return <Password />
           case 4: return <Member />
       }
     };
+
+    if (user && user.length <= 0) return (<div>Loading...</div>);
 
     return (
         <div id="info">

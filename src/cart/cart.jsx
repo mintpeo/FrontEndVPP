@@ -9,13 +9,32 @@ import useFetch from "../hooks/useFetch.js";
 import DiscountPricePer from "../components/discountPricePer.jsx";
 
 const Cart = () => {
-    const user = GetStoredUser();
-    const {data: serverCarts} = useFetch(`${API_URL}/cart?userId=${user.id}`);
+    const token = GetStoredUser();
+    const [serverCarts, setServerCarts] = useState([]);
     const [carts, setCarts] = useState([]);
     const [selectedItems, setSelectedItems] = useState([]);
     const navigate = useNavigate();
 
-    console.log(carts)
+    useEffect(() => {
+        const getCart = async () => {
+            try {
+                const res = await fetch(`${API_URL}/cart`, {
+                    method: "GET",
+                    headers: {
+                        "AT": token.accessToken
+                    }
+                });
+
+                const data = await res.json();
+                setServerCarts(data);
+            } catch (e) {
+                console.log("Error Get Cart", e);
+            }
+        };
+        getCart();
+    }, [])
+
+    console.log("Cart", carts);
 
     // Detail
     const handleToDetail = (id) => {
@@ -73,7 +92,7 @@ const Cart = () => {
 
         if (newQuantity < 1) return;
 
-        // for each phai F5 moi update nen dung map
+        // dung 'for each' phai F5 moi update nen dung map
         const upNewQuan = carts.map(item => {
             if (item.id === id) return {...item, quantity: newQuantity};
             return item;
@@ -141,18 +160,18 @@ const Cart = () => {
                                                 onChange={() => toggleSelectItem(item.id)}
                                             />
 
-                                            <img onClick={() => handleToDetail(item.product_id)} src={item.image} alt="" className="item-img"/>
+                                            <img onClick={() => handleToDetail(item.productId)} src={item.image} alt="" className="item-img"/>
 
                                             <div className="item-cart">
                                                 <div className="item-left">
-                                                    <div onClick={() => handleToDetail(item.product_id)} className="name" title="222">{item.product.name}</div>
+                                                    <div onClick={() => handleToDetail(item.productId)} className="name" title="222">{item.name}</div>
                                                     {item.type && item.type.length > 0 ? (<div className="type">Loại: {item.type}</div>) : ("")}
                                                 </div>
 
                                                 <div className="item-middle">
-                                                    <div className="price-dis">{item.product.price.toLocaleString()}{item.product.currency}</div>
-                                                    <div className="price-noDis">{item.product.originalPrice.toLocaleString()}{item.product.currency}</div>
-                                                    <div className="price-percent"><DiscountPricePer originalPrice={item.product.originalPrice} discountedPrice={item.product.price} sub={true} /></div>
+                                                    <div className="price-dis">{item.price.toLocaleString()}{item.currency}</div>
+                                                    <div className="price-noDis">{item.originalPrice.toLocaleString()}{item.currency}</div>
+                                                    <div className="price-percent"><DiscountPricePer originalPrice={item.originalPrice} discountedPrice={item.price} sub={true} /></div>
                                                 </div>
 
                                                 <div className="item-right">
